@@ -1,0 +1,7 @@
+fragment Category on SwellCategory {
+  name
+  slug
+  metaDescription
+  metaKeywords
+  description
+}

@@ -1,0 +1,150 @@
+// app/page.tsx
+import { getMixtapes } from 'lib/data/mixtapes';
+import { getBatchProductsCached } from 'lib/data/products/index';
+import { getFeatures } from 'lib/queries/sanity/features';
+import { unstable_cache } from 'next/cache';
+import React, { Suspense } from 'react';
+
+import type { Feature } from 'lib/data/products/types';
+
+import ClientHomepage from 'components/ClientHomepage';
+import FeatureSwiper from 'components/FeatureSwiper';
+import FeaturedMixtapes from 'components/mixtapes/FeaturedMixtapes';
+import FeaturedProducts from 'components/products/FeaturedProducts';
+import NewProducts from 'components/products/NewProducts';
+
+type ProductsResult = Awaited<ReturnType<typeof getBatchProductsCached>>;
+type MixtapesResult = Awaited<ReturnType<typeof getMixtapes>>;
+
+type ExtendedMergedProduct = ProductsResult['featured'][number];
+type Mixtape = MixtapesResult[number];
+
+export const revalidate = 3600;
+export const dynamic = 'force-static';
+export const fetchCache = 'force-cache';
+
+const getCachedFeatures = unstable_cache(
+  async () => {
+    return getFeatures(5);
+  },
+  ['homepage-features'],
+  { revalidate: 3600 }
+);
+
+const getCachedProducts = unstable_cache(
+  async () => {
+    try {
+      // Get featured and new products with proper image filtering
+      const { getFeaturedProducts, getNewProducts } = await import('lib/data/products/index');
+
+      const [featured, newProducts] = await Promise.all([
+        getFeaturedProducts(10).catch(() => []),
+        getNewProducts(24, []).catch(() => []) // Get 24, will filter out featured
+      ]);
+
+      // Filter out featured products from new products
+      const featuredIds = new Set(featured.map((p) => p.id));
+      const filteredNew = newProducts.filter((p) => !featuredIds.has(p.id)).slice(0, 12);
+
+      return { featured, new: filteredNew };
+    } catch (error) {
+      return { featured: [], new: [] };
+    }
+  },
+  ['homepage-products'],
+  { revalidate: 1800 }
+);
+
+const getCachedMixtapes = unstable_cache(
+  async () => {
+    return getMixtapes('recent', 12);
+  },
+  ['homepage-mixtapes'],
+  { revalidate: 3600 }
+);
+
+async function FastFeatureLoader() {
+  const features = await getCachedFeatures().catch(() => [] as Feature[]);
+
+  return (
+    <section className="homepage-section swiper-section">
+      <FeatureSwiper autoplay={features.length > 0} limit={5} preloadedFeatures={features} />
+    </section>
+  );
+}
+
+async function SlowProductsLoader() {
+  const start = performance.now();
+
+  const [productsResult, mixtapesResult] = await Promise.all([
+    getCachedProducts().catch(() => ({ featured: [], new: [] }) as ProductsResult),
+    getCachedMixtapes().catch(() => [] as MixtapesResult)
+  ]);
+
+  const end = performance.now();
+
+  const featuredProducts = productsResult.featured || [];
+  const newProducts = productsResult.new || [];
+  const mixtapes = mixtapesResult || [];
+
+  if (typeof globalThis !== 'undefined') {
+    globalThis.featuredProductIds = featuredProducts.map((p: ExtendedMergedProduct) => p.id);
+    globalThis.featuredProductsComplete = true;
+  }
+
+  return (
+    <>
+      {featuredProducts.length > 0 && (
+        <section className="homepage-section featured-products-section">
+          <FeaturedProducts preloadedData={featuredProducts} />
+        </section>
+      )}
+
+      {newProducts.length > 0 && (
+        <section className="homepage-section new-products-section">
+          <NewProducts
+            preloadedData={newProducts}
+            excludedIds={featuredProducts.map((p: ExtendedMergedProduct) => p.id)}
+          />
+        </section>
+      )}
+
+      {mixtapes.length > 0 && (
+        <section className="homepage-section mixtapes-section">
+          <FeaturedMixtapes preloadedData={mixtapes} />
+        </section>
+      )}
+    </>
+  );
+}
+
+function ProductsSkeleton() {
+  return (
+    <div style={{ minHeight: '100vh' }}>
+      <section className="homepage-section featured-products-section">
+        <div style={{ height: '400px' }}></div>
+      </section>
+      <section className="homepage-section new-products-section">
+        <div style={{ height: '400px' }}></div>
+      </section>
+      <section className="homepage-section mixtapes-section">
+        <div style={{ height: '400px' }}></div>
+      </section>
+    </div>
+  );
+}
+
+export default async function HomePage(): Promise<React.JSX.Element> {
+  return (
+    <>
+      <main className="homepage-container">
+        <ClientHomepage>
+          <FastFeatureLoader />
+          <Suspense fallback={<ProductsSkeleton />}>
+            <SlowProductsLoader />
+          </Suspense>
+        </ClientHomepage>
+      </main>
+    </>
+  );
+}

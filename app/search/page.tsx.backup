@@ -1,0 +1,506 @@
+// app/search/page.tsx - Final version with direct fixes
+
+'use client';
+
+import { GridContainer } from 'components/grid/Container';
+import { GridItem } from 'components/grid/Item';
+import MixtapeCard from 'components/mixtapes/MixtapeCard';
+import ProductCard from 'components/products/ProductCard';
+import { searchProductsFast } from 'lib/queries/sanity/search';
+import { defaultSort, sorting } from 'lib/shared/constants/global';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+export default function SearchPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // State
+  const [searchState, setSearchState] = useState({
+    products: [] as any[],
+    mixtapes: [] as any[],
+    isLoading: false,
+    searchTime: 0,
+    total: 0,
+    hasSearched: false,
+    currentPage: 1,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+    productsTotal: 0,
+    mixtapesTotal: 0
+  });
+
+  const [previousSearchValue, setPreviousSearchValue] = useState('');
+
+  // URL parameters
+  const searchValue = searchParams.get('q') || '';
+  const currentSort = searchParams.get('sort') || 'latest-desc';
+  const typeFilter = searchParams.get('type') || 'all';
+  const pageParam = parseInt(searchParams.get('page') || '1', 10);
+
+  const { sortKey, reverse } = sorting.find((item) => item.slug === currentSort) || defaultSort;
+
+  // Filtered results
+  const filteredResults = useMemo(() => {
+    let filteredProducts = searchState.products;
+    let filteredMixtapes = searchState.mixtapes;
+
+    if (typeFilter === 'products') {
+      filteredMixtapes = [];
+    } else if (typeFilter === 'mixtapes') {
+      filteredProducts = [];
+    }
+
+    return {
+      products: filteredProducts,
+      mixtapes: filteredMixtapes,
+      totalCount: filteredProducts.length + filteredMixtapes.length
+    };
+  }, [searchState.products, searchState.mixtapes, typeFilter]);
+
+  // Main search function
+  const performSearch = useCallback(
+    async (params: any = {}) => {
+      const {
+        query = searchValue,
+        sort = currentSort,
+        page = pageParam,
+        type = typeFilter
+      } = params;
+
+      if (!query?.trim()) {
+        setSearchState({
+          products: [],
+          mixtapes: [],
+          isLoading: false,
+          searchTime: 0,
+          total: 0,
+          hasSearched: false,
+          currentPage: 1,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          productsTotal: 0,
+          mixtapesTotal: 0
+        });
+        updateUI(0, 0, 0, type);
+        return;
+      }
+
+      setSearchState((prev) => ({ ...prev, isLoading: true, hasSearched: true }));
+
+      try {
+        const result = await searchProductsFast({
+          query,
+          sort,
+          limit: 48,
+          page,
+          type
+        });
+
+        const resultProducts = result.products.filter((item: any) => item._type === 'product');
+        const resultMixtapes = result.products.filter((item: any) => item._type === 'mixtape');
+
+        setSearchState({
+          products: resultProducts,
+          mixtapes: resultMixtapes,
+          isLoading: false,
+          searchTime: result.searchTime,
+          total: result.total,
+          hasSearched: true,
+          currentPage: result.page,
+          totalPages: result.totalPages,
+          hasNextPage: result.hasNextPage,
+          hasPreviousPage: result.hasPreviousPage,
+          productsTotal: result.productsTotal || 0,
+          mixtapesTotal: result.mixtapesTotal || 0
+        });
+
+        // Update UI immediately
+        updateUI(result.total, result.productsTotal || 0, result.mixtapesTotal || 0, type);
+
+        // Clear search inputs
+        if (result.products.length > 0) {
+          setTimeout(() => {
+            const clearEvent = new CustomEvent('clearSearchInputs', {
+              bubbles: true,
+              detail: { clearValue: true }
+            });
+            document.dispatchEvent(clearEvent);
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchState((prev) => ({
+          ...prev,
+          isLoading: false,
+          products: [],
+          mixtapes: [],
+          total: 0,
+          productsTotal: 0,
+          mixtapesTotal: 0
+        }));
+        updateUI(0, 0, 0, type);
+      }
+    },
+    [searchValue, currentSort, pageParam, typeFilter]
+  );
+
+  // Direct UI update function
+  const updateUI = (
+    total: number,
+    productsTotal: number,
+    mixtapesTotal: number,
+    currentType: string
+  ) => {
+    // Update results count
+    const resultsElement = document.getElementById('search-results-count');
+    if (resultsElement) {
+      resultsElement.textContent =
+        total > 0 ? `(${total} ${total === 1 ? 'result' : 'results'})` : '';
+    }
+
+    // Update filter visibility
+    const hasProducts = productsTotal > 0;
+    const hasMixtapes = mixtapesTotal > 0;
+
+    // Show sort options when filtering by products OR when in ALL mode with products
+    const showSortOptions = (currentType === 'products' || currentType === 'all') && total > 9;
+
+    // Sort options - show for both products filter and all filter
+    document.querySelectorAll('.sort-option-item').forEach((item) => {
+      (item as HTMLElement).style.display = showSortOptions ? 'list-item' : 'none';
+    });
+
+    // Type filters - always show when there are results
+    document.querySelectorAll('.type-filter-item').forEach((item) => {
+      (item as HTMLElement).style.display = 'list-item';
+    });
+    document.querySelectorAll('.type-filter-products').forEach((item) => {
+      (item as HTMLElement).style.display = hasProducts ? 'list-item' : 'none';
+    });
+    document.querySelectorAll('.type-filter-mixtapes').forEach((item) => {
+      (item as HTMLElement).style.display = hasMixtapes ? 'list-item' : 'none';
+    });
+
+    // Update bold states
+    document.querySelectorAll('.sort-option').forEach((btn) => {
+      const sortSlug = btn.getAttribute('data-sort') || '';
+      // Bold sort options when they match AND we're not on default sort
+      const shouldBold = sortSlug === currentSort && currentSort !== 'latest-desc';
+      btn.classList.toggle('bold', shouldBold);
+    });
+
+    document.querySelectorAll('.type-filter').forEach((btn) => {
+      const filterType = btn.getAttribute('data-type') || 'all';
+      const shouldBold = filterType === currentType;
+      btn.classList.toggle('bold', shouldBold);
+    });
+  };
+
+  // Handle pagination
+  const goToPage = useCallback(
+    (page: number) => {
+      if (page < 1 || page > searchState.totalPages) return;
+
+      const params = new URLSearchParams();
+      if (searchValue) params.set('q', searchValue);
+      if (currentSort) params.set('sort', currentSort);
+      if (typeFilter !== 'all') params.set('type', typeFilter);
+      params.set('page', page.toString());
+
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+    },
+    [searchValue, currentSort, typeFilter, pathname, router, searchState.totalPages]
+  );
+
+  // Handle new search submissions
+  useEffect(() => {
+    if (searchValue && searchValue !== previousSearchValue && previousSearchValue !== '') {
+      const params = new URLSearchParams();
+      params.set('q', searchValue);
+      params.set('sort', 'latest-desc');
+      params.set('page', '1');
+      params.set('type', 'all'); // Always reset to all
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+    setPreviousSearchValue(searchValue);
+  }, [searchValue, previousSearchValue, pathname, router]);
+
+  // Handle sort clicks
+  useEffect(() => {
+    const handleSortClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (!target.classList.contains('sort-option')) return;
+
+      e.preventDefault();
+      const sortSlug = target.getAttribute('data-sort') || '';
+      const params = new URLSearchParams();
+
+      if (searchValue) params.set('q', searchValue);
+      if (sortSlug) params.set('sort', sortSlug);
+      // Keep current type filter, don't auto-switch to products
+      if (typeFilter !== 'all') params.set('type', typeFilter);
+      params.set('page', '1');
+
+      router.push(`${pathname}?${params.toString()}`);
+    };
+
+    document.addEventListener('click', handleSortClick);
+    return () => document.removeEventListener('click', handleSortClick);
+  }, [searchValue, pathname, router, typeFilter]);
+
+  // Handle type filter clicks
+  useEffect(() => {
+    const handleTypeFilterClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (!target.classList.contains('type-filter')) return;
+
+      e.preventDefault();
+      const filterType = target.getAttribute('data-type') || 'all';
+      const params = new URLSearchParams();
+
+      if (searchValue) params.set('q', searchValue);
+      params.set('sort', 'latest-desc'); // Always reset sort
+      if (filterType !== 'all') params.set('type', filterType);
+      params.set('page', '1');
+
+      router.push(`${pathname}?${params.toString()}`);
+    };
+
+    document.addEventListener('click', handleTypeFilterClick);
+    return () => document.removeEventListener('click', handleTypeFilterClick);
+  }, [searchValue, pathname, router]);
+
+  // Trigger search when params change
+  useEffect(() => {
+    performSearch({ page: pageParam });
+  }, [searchValue, currentSort, pageParam, typeFilter, performSearch]);
+
+  // Update UI when params change
+  useEffect(() => {
+    if (searchState.hasSearched) {
+      updateUI(searchState.total, searchState.productsTotal, searchState.mixtapesTotal, typeFilter);
+    }
+  }, [
+    currentSort,
+    typeFilter,
+    searchState.total,
+    searchState.productsTotal,
+    searchState.mixtapesTotal,
+    searchState.hasSearched
+  ]);
+
+  // Pagination component
+  const PaginationControls = useMemo(() => {
+    if (searchState.totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const showPages = 5;
+      let startPage = Math.max(1, searchState.currentPage - Math.floor(showPages / 2));
+      let endPage = Math.min(searchState.totalPages, startPage + showPages - 1);
+
+      if (endPage - startPage + 1 < showPages) {
+        startPage = Math.max(1, endPage - showPages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      return pages;
+    };
+
+    return (
+      <div className="d-flex justify-content-center align-items-center mb-4 mt-4">
+        <nav aria-label="Search results pagination">
+          <ul className="pagination pagination-sm mb-0">
+            <li className={`page-item ${!searchState.hasPreviousPage ? 'disabled' : ''}`}>
+              <button
+                className="page-link"
+                onClick={() => goToPage(searchState.currentPage - 1)}
+                disabled={!searchState.hasPreviousPage}
+                aria-label="Previous page"
+              >
+                ‹
+              </button>
+            </li>
+
+            {getPageNumbers()[0] > 1 && (
+              <>
+                <li className="page-item">
+                  <button className="page-link" onClick={() => goToPage(1)}>
+                    1
+                  </button>
+                </li>
+                {getPageNumbers()[0] > 2 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">…</span>
+                  </li>
+                )}
+              </>
+            )}
+
+            {getPageNumbers().map((page) => (
+              <li
+                key={page}
+                className={`page-item ${page === searchState.currentPage ? 'active' : ''}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => goToPage(page)}
+                  aria-label={`Page ${page}`}
+                  aria-current={page === searchState.currentPage ? 'page' : undefined}
+                >
+                  {page}
+                </button>
+              </li>
+            ))}
+
+            {getPageNumbers()[getPageNumbers().length - 1] < searchState.totalPages && (
+              <>
+                {getPageNumbers()[getPageNumbers().length - 1] < searchState.totalPages - 1 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">…</span>
+                  </li>
+                )}
+                <li className="page-item">
+                  <button className="page-link" onClick={() => goToPage(searchState.totalPages)}>
+                    {searchState.totalPages}
+                  </button>
+                </li>
+              </>
+            )}
+
+            <li className={`page-item ${!searchState.hasNextPage ? 'disabled' : ''}`}>
+              <button
+                className="page-link"
+                onClick={() => goToPage(searchState.currentPage + 1)}
+                disabled={!searchState.hasNextPage}
+                aria-label="Next page"
+              >
+                ›
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="text-muted small ms-3">
+          Page {searchState.currentPage} of {searchState.totalPages}
+        </div>
+      </div>
+    );
+  }, [
+    searchState.totalPages,
+    searchState.currentPage,
+    searchState.hasNextPage,
+    searchState.hasPreviousPage,
+    goToPage
+  ]);
+
+  return (
+    <div className="m-0 p-0">
+      {searchValue && (
+        <div className="row m-0">
+          <div className="col-12 p-0">
+            <div className="py-4 text-center">
+              <h1
+                className="search-header outline"
+                style={{
+                  fontSize: '4rem',
+                  fontWeight: 'bold',
+                  margin: '0',
+                  padding: '0',
+                  animation: searchState.isLoading
+                    ? 'searchPulse 0.545s ease-in-out infinite'
+                    : 'none',
+                  fontFamily: 'inherit'
+                }}
+              >
+                {searchValue}
+              </h1>
+              <style jsx>{`
+                @keyframes searchPulse {
+                  0%,
+                  100% {
+                    opacity: 0.3;
+                  }
+                  50% {
+                    opacity: 1;
+                  }
+                }
+              `}</style>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!searchState.isLoading &&
+        (filteredResults.products.length > 0 || filteredResults.mixtapes.length > 0) && (
+          <>
+            {filteredResults.products.length > 0 && typeFilter !== 'mixtapes' && (
+              <div className="products-section mb-5">
+                <GridContainer>
+                  {filteredResults.products.map((item: any, index: number) => (
+                    <GridItem
+                      key={`search-product-${item.sku || item._id}-${index}-page-${
+                        searchState.currentPage
+                      }`}
+                      type="product"
+                      id={item._id}
+                      inStock={item.stock > 0 || item.inStock}
+                      stock={item.stock}
+                      featured={false}
+                    >
+                      <ProductCard product={item} variant="regular" index={index} />
+                    </GridItem>
+                  ))}
+                </GridContainer>
+              </div>
+            )}
+
+            {filteredResults.mixtapes.length > 0 && (
+              <div className="mixtapes-section mb-5">
+                <GridContainer>
+                  {filteredResults.mixtapes.map((item: any, index: number) => (
+                    <GridItem
+                      key={`search-mixtape-${item._id}-${index}-page-${searchState.currentPage}`}
+                      type="mixtape"
+                      id={item._id}
+                      inStock={true}
+                      stock={1}
+                      featured={false}
+                    >
+                      <MixtapeCard mixtape={item} variant="regular" index={index} />
+                    </GridItem>
+                  ))}
+                </GridContainer>
+              </div>
+            )}
+
+            {PaginationControls}
+          </>
+        )}
+
+      {searchState.isLoading && <div style={{ minHeight: '100vh', width: '100%' }}></div>}
+
+      {searchState.hasSearched &&
+        searchValue &&
+        filteredResults.products.length === 0 &&
+        filteredResults.mixtapes.length === 0 &&
+        !searchState.isLoading && (
+          <div className="row m-0">
+            <div className="col-12 p-0">
+              <div className="py-5 text-center">
+                <p className="text-muted mb-4">No results found for &quot;{searchValue}&quot;</p>
+              </div>
+            </div>
+          </div>
+        )}
+    </div>
+  );
+}

@@ -1,0 +1,108 @@
+
+> build
+> next build
+
+   ▲ Next.js 15.4.4
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ✓ scrollRestoration
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 18.0s
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/92) ...
+   Generating static pages (23/92) 
+   Generating static pages (46/92) 
+   Generating static pages (69/92) 
+ ✓ Generating static pages (92/92)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS  Revalidate  Expire
+┌ ○ /                                     32.7 kB         228 kB         30m      1y
+├ ○ /_not-found                              1 kB         101 kB
+├ ƒ /[...slug]                              230 B         100 kB
+├ ƒ /[slug]                                 762 B         156 kB
+├ ○ /account/login                         1.8 kB         150 kB
+├ ○ /account/orders                          3 kB         155 kB
+├ ○ /account/reset                        1.64 kB         102 kB
+├ ○ /account/reset-password               1.91 kB         102 kB
+├ ○ /account/wantlist                     3.38 kB         155 kB
+├ ƒ /api/auth/reset-password                230 B         100 kB
+├ ƒ /api/auth/reset-password-complete       230 B         100 kB
+├ ƒ /api/cache/invalidate                   230 B         100 kB
+├ ƒ /api/cleanup-wantlist                   230 B         100 kB
+├ ƒ /api/debug-custom-model                 230 B         100 kB
+├ ƒ /api/debug-swell                        230 B         100 kB
+├ ƒ /api/debug-swell-auth                   230 B         100 kB
+├ ƒ /api/force-cleanup                      230 B         100 kB
+├ ƒ /api/investigate-swell                  230 B         100 kB
+├ ƒ /api/klaviyo/subscribe                  230 B         100 kB
+├ ƒ /api/klaviyo/track                      230 B         100 kB
+├ ƒ /api/migrate-final                      230 B         100 kB
+├ ƒ /api/migrate-fixed                      230 B         100 kB
+├ ƒ /api/migrate-wantlist                   230 B         100 kB
+├ ƒ /api/orders                             230 B         100 kB
+├ ƒ /api/revalidate                         230 B         100 kB
+├ ƒ /api/simple-migrate                     230 B         100 kB
+├ ƒ /api/test-content-model                 230 B         100 kB
+├ ƒ /api/test-swell-direct                  230 B         100 kB
+├ ƒ /api/test-swell-node                    230 B         100 kB
+├ ƒ /api/test-wantlist                      230 B         100 kB
+├ ƒ /api/update-tracklist                   230 B         100 kB
+├ ƒ /api/wantlist                           230 B         100 kB
+├ ƒ /api/wantlist-account                   230 B         100 kB
+├ ƒ /api/wantlist-backend                   230 B         100 kB
+├ ƒ /api/wantlist-content                   230 B         100 kB
+├ ƒ /api/wantlist-debug                     230 B         100 kB
+├ ƒ /api/wantlist-model                     230 B         100 kB
+├ ƒ /api/wantlist-sdk                       230 B         100 kB
+├ ƒ /api/wantlist-simple                    230 B         100 kB
+├ ƒ /api/wantlist-v2                        230 B         100 kB
+├ ƒ /api/wantlist/check                     230 B         100 kB
+├ ƒ /api/webhooks/swell                     230 B         100 kB
+├ ƒ /contributor/[slug]                   1.32 kB         113 kB
+├ ○ /debug-discogs                         2.9 kB         106 kB
+├ ƒ /info/[slug]                            762 B         156 kB
+├ ƒ /mixtape/[handle]                     7.35 kB         205 kB
+├ ƒ /mixtapes                             1.31 kB         113 kB
+├ ● /mixtapes/[tag]                       1.31 kB         113 kB
+├   ├ /mixtapes/groovy
+├   ├ /mixtapes/chill
+├   ├ /mixtapes/global
+├   └ [+3 more paths]
+├ ƒ /opengraph-image                        230 B         100 kB
+├ ● /product/[handle]                     16.9 kB         225 kB          1h      1y
+├   ├ /product/baby-youre-the-one-2                                       1h      1y
+├   ├ /product/midnight-in-tokyo-vol-4                                    1h      1y
+├   ├ /product/body-singer                                                1h      1y
+├   └ [+25 more paths]
+├ ○ /robots.txt                             230 B         100 kB
+├ ○ /search                               8.47 kB         204 kB
+├ ƒ /search/[collection]                    414 B         159 kB
+├ ƒ /search/[collection]/opengraph-image    230 B         100 kB
+├ ƒ /shop/artist/[slug]                     583 B         215 kB
+├ ƒ /shop/format/[slug]                     583 B         215 kB
+├ ● /shop/genre/[slug]                      570 B         215 kB
+├   ├ /shop/genre/house
+├   ├ /shop/genre/jazz
+├   ├ /shop/genre/ambient
+├   └ [+13 more paths]
+├ ƒ /shop/label/[slug]                      583 B         215 kB
+├ ƒ /shop/new                               570 B         215 kB
+├ ƒ /shop/tag/[slug]                        583 B         215 kB
+├ ƒ /shop/week/[slug]                       583 B         215 kB
+└ ƒ /sitemap.xml                            230 B         100 kB
++ First Load JS shared by all              100 kB
+  ├ chunks/1f8709d7-e89ba3539792dd94.js   54.1 kB
+  ├ chunks/4142-cdf70b1ad8d10ba4.js       43.9 kB
+  └ other shared chunks (total)           2.19 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

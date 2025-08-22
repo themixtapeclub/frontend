@@ -1,0 +1,567 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  img[loading='lazy'] {
+    clip-path: inset(0.6px);
+  }
+}
+
+a,
+input,
+button {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
+}
+
+body {
+  // font-size: 1.1rem;
+}
+html,
+body,
+p {
+  font-family: var(--font-system85-pro), sans-serif !important;
+  font-feature-settings: 'ss06', 'ss02', 'pnum' !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.swiper-full-width {
+  overflow-x: hidden;
+}
+
+.bold,
+strong {
+  font-weight: bold;
+}
+
+.mono {
+  font-family: var(--font-system85-mono-pro), monospace !important;
+  letter-spacing: -0.0125rem;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.outline {
+  text-shadow:
+    0.75px 0px 0px #050505,
+    1.31638px 0.719138px 0px #050505,
+    0.81045px 1.262205px 0px #050505,
+    0.106106px 1.496242px 0px #050505,
+    -0.624221px 1.363942px 0px #050505,
+    -1.201717px 0.897705px 0px #050505,
+    -1.48599px 0.21168px 0px #050505,
+    -1.404683px -0.526175px 0px #050505,
+    -0.980468px -1.1352px 0px #050505,
+    -0.316194px -1.466295px 0px #050505,
+    0.425493px -1.438387px 0px #050505,
+    1.063005px -1.05831px 0px #050505,
+    1.140255px -0.419148px 0px #050505;
+  font-weight: 500;
+  color: #fff !important;
+  outline-style: none;
+  text-decoration: none;
+}
+
+.monogram {
+  transition:
+    opacity 0.3s ease,
+    position 0s;
+  opacity: 1;
+  left: 1.175rem;
+  top: -0rem;
+  mix-blend-mode: difference;
+  width: auto;
+  video {
+    height: 3.85rem;
+    width: 100%;
+  }
+}
+
+.menu-item.current-menu-item a,
+.menu-item.current_page_item a {
+  font-weight: bold;
+}
+
+header {
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+}
+
+header input {
+  box-shadow: none !important;
+}
+
+#menu-full {
+  top: 3.3rem;
+}
+
+#menu-full ul > li.menu-item-has-children > a,
+#menu-full ul > li.mb-5 > a,
+#menu-full ul > li .outline {
+  border-top: 1px solid black;
+}
+
+#menu-full ul li > a {
+  // display: block;
+  border-bottom: 1px solid #e5e5e5;
+  transition: all 0.3s ease;
+}
+
+#menu-full ul li:last-of-type ul li:last-of-type a {
+  border-bottom: 0;
+}
+
+#menu-full ul li {
+  border: none;
+}
+
+.yellow {
+  color: #f7d51d !important;
+}
+
+/* globals.scss */
+:root {
+  --header-height: 0px; /* Will be set by JavaScript */
+}
+
+.swiper-full-width {
+  margin-top: calc(-1.05 * var(--header-height));
+  // width: 100.1% !important;
+}
+
+/* Simple mobile menu CSS */
+.mobile-menu-container {
+  background: white;
+  border-top: 1px solid #eee;
+  padding: 1rem;
+}
+
+.mobile-menu-container nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobile-menu-container nav a {
+  padding: 0.5rem 0;
+  text-decoration: none;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.search-input {
+  border: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.search-input:focus {
+  outline: none !important;
+  border: 1px solid black;
+  color: white;
+  background-color: black;
+}
+
+#menu-full .search input {
+  border-top: 1px solid black;
+  &:focus-visible {
+    box-shadow: none !important;
+  }
+}
+
+#menu-full .row > [class*='col-']:not([class*='col-12']) + [class*='col-']:not([class*='col-12']),
+#menu-full .row > .col + [class*='col-']:not([class*='col-12']),
+#menu-full .row > [class*='col-']:not([class*='col-12']) + .col {
+  border-left: 1px solid #e5e5e5;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-left-color: rgb(229, 229, 229);
+}
+
+#menu-full ul li > a {
+  &:hover,
+  &:focus,
+  &:focus-visible {
+    background-color: #050505 !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-color: #050505 !important;
+    box-shadow: none !important;
+  }
+}
+
+main {
+  margin-top: 3.3rem;
+  position: relative;
+}
+
+header.sticky-top {
+  mix-blend-mode: normal; /* Reset any existing blend mode */
+  isolation: auto; /* Allow blend modes to work through */
+}
+
+/* Then target the button */
+button[aria-label*='mobile menu'] {
+  mix-blend-mode: difference;
+  position: relative;
+  z-index: 1;
+}
+
+/* Add these styles to your global CSS - minimal fixes only */
+
+/* Prevent layout shifts when cart modal opens */
+body.cart-modal-open {
+  /* Maintain scroll position and prevent shift */
+  position: fixed;
+  width: 100%;
+  overflow-y: scroll; /* Keep scrollbar visible to prevent width changes */
+}
+
+/* Ensure tools section stays stable */
+.tools {
+  position: relative;
+  z-index: 100;
+  /* Add will-change to optimize for transforms */
+  will-change: auto;
+}
+
+.tools ul {
+  /* Prevent flex items from jumping */
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.tools li {
+  /* Ensure consistent spacing */
+  flex-shrink: 0;
+}
+
+/* Optional: Add transform3d to force hardware acceleration and prevent repaints */
+.tools .sticky-top {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Ensure cart button area is stable */
+.d-flex.sup.yellow {
+  position: relative;
+  z-index: 10;
+  /* Prevent button from shifting during modal transitions */
+  transform: translate3d(0, 0, 0);
+}
+
+/* Add these styles to your global CSS - minimal fixes only */
+
+/* Prevent layout shifts when cart modal opens */
+body.cart-modal-open {
+  /* Maintain scroll position and prevent shift */
+  position: fixed;
+  width: 100%;
+  overflow-y: scroll; /* Keep scrollbar visible to prevent width changes */
+}
+
+/* Ensure tools section stays stable */
+.tools {
+  position: relative;
+  z-index: 100;
+  /* Add will-change to optimize for transforms */
+  will-change: auto;
+}
+
+.tools ul {
+  /* Prevent flex items from jumping */
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.tools li {
+  /* Ensure consistent spacing */
+  flex-shrink: 0;
+}
+
+/* Optional: Add transform3d to force hardware acceleration and prevent repaints */
+.tools,
+.sticky-top {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Ensure cart button area is stable */
+.d-flex.sup.yellow {
+  position: relative;
+  z-index: 10;
+  /* Prevent button from shifting during modal transitions */
+  transform: translate3d(0, 0, 0);
+}
+.product-details {
+  border-bottom: 1px solid lightgray;
+
+  & > .container-fluid {
+    border-left: 1px solid lightgray;
+
+    &:first-of-type {
+      border-left: 0;
+    }
+  }
+}
+
+.in-mixtapes,
+.sortby {
+  border-top: 1px solid lightgray;
+}
+
+.submenu {
+  .row {
+    .genre,
+    .format {
+      border-top: 1px solid lightgray;
+    }
+  }
+}
+
+.tracklist-container {
+  overflow: clip;
+}
+
+.product-details .sticky-top {
+  margin-top: -2px;
+  margin-bottom: -2px;
+  height: fit-content;
+  top: 2.625rem;
+}
+
+// styles/globals.scss - Move CSS out of dangerouslySetInnerHTML
+/* Prevent hydration flash */
+.menu,
+.search-menu {
+  transition: none !important;
+}
+
+/* Re-enable transitions after hydration */
+.hydrated .menu,
+.hydrated .search-menu {
+  transition:
+    opacity 0.3s ease-in-out,
+    filter 0.3s ease-in-out !important;
+}
+
+/* Reserve space for feature swiper */
+.feature-swiper-container {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Font loading optimization */
+.font-loading {
+  font-display: swap;
+}
+
+.genre .d-sm-flex.submenu {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.genre .d-sm-flex.submenu .menu-item {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Force line breaks before potential orphans using ::before pseudo-elements */
+.genre .d-sm-flex.submenu .menu-item:nth-last-child(3)::before,
+.genre .d-sm-flex.submenu .menu-item:nth-last-child(2)::before,
+.genre .d-sm-flex.submenu .menu-item:nth-last-child(1)::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 0;
+  flex-basis: 100%;
+}
+
+/* Alternative approach: Use CSS break properties */
+.genre .d-sm-flex.submenu .menu-item:nth-last-child(4) {
+  break-after: auto;
+}
+
+.genre .d-sm-flex.submenu .menu-item:nth-last-child(3) {
+  break-before: always;
+}
+
+/* Bold styling for active/current page links */
+.menu-item.current-menu-item a,
+.menu-item.current_page_item a,
+.submenu .bold {
+  font-weight: bold !important;
+}
+
+/* Add this to your global styles */
+
+/* Visible centered outline using stroke + drop-shadow combination */
+.outline-icon {
+  fill: #fff !important;
+  stroke: #050505;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+  font-weight: 500;
+  outline-style: none;
+  text-decoration: none;
+}
+
+.now-playing button {
+  border: 0 !important;
+}
+
+/* Add to your global CSS file */
+
+/* Alternative CSS-only approach using scroll-driven animations */
+.logotype {
+  /* Container stays in normal flow */
+  position: relative;
+}
+
+.logotype > div {
+  /* Inner element that moves */
+  transform: translateY(2.6rem);
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* If browser supports scroll-driven animations (experimental) */
+@supports (animation-timeline: scroll()) {
+  .logotype > div {
+    animation: slide-up linear;
+    animation-timeline: scroll(root);
+    animation-range: 0px 41.6px; /* 2.6rem ≈ 41.6px */
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(2.6rem);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Responsive adjustments */
+// @media (max-width: 768px) {
+//   .logotype > div {
+//     transform: translateY(1.5rem); /* Smaller offset on mobile */
+//   }
+
+//   @supports (animation-timeline: scroll()) {
+//     .logotype > div {
+//       animation-range: 0px 24px; /* 1.5rem ≈ 24px */
+//     }
+
+//     @keyframes slide-up {
+//       from {
+//         transform: translateY(1.5rem);
+//       }
+//       to {
+//         transform: translateY(0);
+//       }
+//     }
+//   }
+// }
+
+/* Ensure smooth performance */
+.logotype,
+.logotype > div {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optional: Add subtle visual feedback */
+.logotype > div:hover {
+  transform: translateY(calc(var(--scroll-offset, 2.6rem) - 2px));
+}
+.play {
+  &:focus {
+    outline: none;
+  }
+}
+
+.page-info.has-hero {
+  margin-top: -6.6rem;
+}
+
+/* Replace the existing .tracklist-row hover styles with these: */
+
+.tracklist-row {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Only apply hover effects to tracks that have product links */
+.tracklist-row.has-product-link:hover {
+  background-color: #000 !important;
+}
+
+.tracklist-row.has-product-link:hover,
+.tracklist-row.has-product-link:hover a,
+.tracklist-row.has-product-link:hover div,
+.tracklist-row.has-product-link:hover .track-artist,
+.tracklist-row.has-product-link:hover .track-title,
+.tracklist-row.has-product-link:hover .track-title strong {
+  color: #fff !important;
+}
+
+/* Ensure cursor pointer only for linked tracks */
+.tracklist-row.has-product-link {
+  cursor: pointer;
+}
+
+.tracklist-row:not(.has-product-link) {
+  cursor: default;
+}
+/* Homepage optimizations */
+.item-wrapper .next-image,
+.item-wrapper img[data-nimg] {
+  transition: none !important;
+  animation: none !important;
+}
+
+.item-wrapper {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.swiper-section {
+  min-height: 400px;
+}
+
+.featured-products-section {
+  min-height: 600px;
+}
+
+.swiper-pagination-bullet,
+.swiper-button-next,
+.swiper-button-prev {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.swiper,
+.swiper-container {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

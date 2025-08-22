@@ -1,0 +1,80 @@
+// components/products/FeaturedProducts.tsx
+
+import { GridContainer } from 'components/grid/Container';
+import { GridItem } from 'components/grid/Item';
+import ProductCard from 'components/products/ProductCard';
+import { MergedProduct, getFeaturedProducts } from 'lib/data/products';
+
+// Extend MergedProduct to include missing properties
+type ExtendedMergedProduct = MergedProduct & {
+  _id?: string;
+  stock?: number;
+  genre?: string;
+  sku?: string;
+};
+
+interface FeaturedProductsProps {
+  preloadedData?: ExtendedMergedProduct[];
+}
+
+declare global {
+  var featuredProductIds: string[] | undefined;
+  var featuredProductsComplete: boolean | undefined;
+}
+
+export default async function FeaturedProducts({ preloadedData }: FeaturedProductsProps = {}) {
+  const startTime = Date.now();
+
+  try {
+    global.featuredProductsComplete = false;
+
+    let products: ExtendedMergedProduct[];
+
+    if (preloadedData && preloadedData.length > 0) {
+      products = preloadedData;
+    } else {
+      // Cast the result to include our extended properties
+      products = (await getFeaturedProducts(10)) as ExtendedMergedProduct[];
+    }
+
+    if (!products?.length) {
+      global.featuredProductsComplete = true;
+      return null;
+    }
+
+    global.featuredProductIds = products
+      .map((p: ExtendedMergedProduct) => p.id)
+      .filter((id: string) => !id.startsWith('drafts.'));
+
+    global.featuredProductsComplete = true;
+
+    return (
+      <GridContainer>
+        {products.map((product: ExtendedMergedProduct, index: number) => (
+          <GridItem
+            key={`featured-${product.sku || product.id}-${index}`}
+            type="product"
+            id={product.id}
+            inStock={(product.stock || 0) > 0}
+            stock={product.stock || 0}
+            category={product.genre}
+            featured={true}
+            baseClassName={index < 6 ? 'col-4 m-0 p-0' : undefined}
+            className={index < 6 ? '' : ''}
+          >
+            <ProductCard
+              key={product.id || product._id}
+              product={product as any} // Temporary cast to satisfy ProductCard
+              variant={index < 6 ? 'featured' : 'regular'}
+              priority={index < 3}
+              index={index}
+            />
+          </GridItem>
+        ))}
+      </GridContainer>
+    );
+  } catch (error) {
+    global.featuredProductsComplete = true;
+    return null;
+  }
+}

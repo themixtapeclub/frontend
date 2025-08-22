@@ -1,0 +1,86 @@
+{
+  "private": true,
+  "packageManager": "pnpm@10.12.1",
+  "pnpm": {
+    "overrides": {
+      "glob@<8": "^10.0.0",
+      "inflight": "npm:lru-cache@^10.0.0",
+      "react": "^18.3.0",
+      "react-dom": "^18.3.0",
+      "react-is": "^18.3.0"
+    }
+  },
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=7"
+  },
+  "scripts": {
+    "analyze": "cross-env ANALYZE=true next build",
+    "build:analyze": "pnpm run analyze",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint-staged": "lint-staged",
+    "prettier": "prettier --write --ignore-unknown .",
+    "prettier:check": "prettier --check --ignore-unknown .",
+    "test": "pnpm lint && pnpm prettier:check",
+    "test:e2e": "playwright test",
+    "codegen": "graphql-codegen -r dotenv/config --config .graphqlrc.yml"
+  },
+  "git": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
+    "@sanity/client": "^7.6.0",
+    "@sanity/image-url": "^1.1.0",
+    "bootstrap": "^5.3.7",
+    "clsx": "^2.0.0",
+    "geist": "^1.2.0",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
+    "graphql-tag": "^2.12.6",
+    "js-cookie": "^3.0.5",
+    "klaviyo-api": "^19.0.0",
+    "next": "15.4.4",
+    "next-sanity": "^9.12.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "sass": "^1.89.2",
+    "swell-js": "^4.2.5",
+    "swell-node": "^6.0.0",
+    "swiper": "^11.2.8"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^6.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@next/bundle-analyzer": "^15.4.4",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "20.10.3",
+    "@types/react": "19.1.9",
+    "@types/react-dom": "19.1.7",
+    "@vercel/git-hooks": "^1.0.0",
+    "autoprefixer": "^10.4.16",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.29.0",
+    "eslint-config-next": "^15.4.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-unicorn": "^49.0.0",
+    "lint-staged": "^15.2.0",
+    "postcss": "^8.4.32",
+    "prettier": "3.1.0",
+    "prettier-plugin-tailwindcss": "^0.5.9",
+    "tailwindcss": "^3.3.6",
+    "typescript": "5.3.2"
+  }
+}

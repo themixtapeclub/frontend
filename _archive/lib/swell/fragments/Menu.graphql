@@ -1,0 +1,5 @@
+fragment Menu on SwellSettingsMenusSection {
+  id
+  name
+  items
+}

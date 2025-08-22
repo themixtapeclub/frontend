@@ -1,0 +1,110 @@
+{
+  "compilerOptions": {
+    // Language and Environment
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "esnext", "es2020"],
+    "allowJs": true,
+    "checkJs": false,
+
+    // Module Resolution
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    // Type Checking - Strict but practical
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+
+    // Additional Checks
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": false,
+
+    // Emit
+    "noEmit": true,
+    "preserveConstEnums": true,
+    "removeComments": false,
+
+    // JavaScript Support
+    "allowUmdGlobalAccess": true,
+
+    // Interop Constraints
+    "forceConsistentCasingInFileNames": true,
+
+    // Completeness
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+
+    // Advanced
+    "incremental": true,
+    "tsBuildInfoFile": ".next/cache/tsconfig.tsbuildinfo",
+
+    // Path Mapping
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"],
+      "@/types/*": ["types/*"],
+      "@/contexts/*": ["contexts/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/app/*": ["app/*"]
+    },
+
+    // React/Next.js specific
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+
+    // For better error messages
+    "pretty": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+
+    // For downlevel iteration (fixes Set/Map iteration errors)
+    "downlevelIteration": true,
+
+    // Plugins
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "types/**/*.ts",
+    "types/**/*.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "_archive",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "*.config.js",
+    "*.config.ts"
+  ],
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "esnext",
+      "moduleResolution": "node"
+    }
+  }
+}

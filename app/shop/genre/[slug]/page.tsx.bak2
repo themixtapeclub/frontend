@@ -1,0 +1,321 @@
+// app/shop/genre/[slug]/page.tsx
+import ArchivePage, { generateArchiveMetadata } from 'components/products/ArchivePage';
+import { sanityClient } from 'lib/cms';
+import { getProductsByArchive } from 'lib/data/products/index';
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+
+// Switch to nodejs runtime for better performance with complex operations
+export const runtime = 'nodejs';
+export const revalidate = 3600;
+
+// Generate static params for menu genres
+export async function generateStaticParams() {
+  // All the genres from your menu
+  const menuGenres = [
+    "house", "jazz", "ambient", "disco", "electronic", "brazil",
+    "africa", "techno", "asia", "world", "downtempo", "gospel",
+    "library", "hip-hop", "rock", "experimental"
+  ];
+  
+  console.log(`🎵 Generating static params for ${menuGenres.length} menu genres`);
+
+  return menuGenres.map(genre => ({ slug: genre }));
+}
+interface PageProps {
+  params: Promise<{
+    slug: string;
+  }>;
+  searchParams: Promise<{
+    page?: string;
+    sort?: string;
+  }>;
+}
+
+// Cache for filter conditions to avoid repeated expensive queries
+const filterConditionCache = new Map<string, { condition: string; timestamp: number }>();
+const CACHE_TTL = 1000 * 60 * 30; // 30 minutes
+
+async function getFilterCondition(slug: string): Promise<string> {
+  // Check cache first
+  const cached = filterConditionCache.get(slug);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.condition;
+  }
+
+  // Optimized submenu query - only fetch what we need
+  const submenuQuery = `*[_type == "submenuItem" && slug.current == "${slug}"][0]{
+    label,
+    relatedGenres
+  }`;
+
+  const submenuItem = await sanityClient.fetch(submenuQuery);
+
+  let filterCondition: string;
+
+  if (submenuItem && submenuItem.relatedGenres && submenuItem.relatedGenres.length > 0) {
+    const mainGenreName = submenuItem.label;
+    const relatedGenres = submenuItem.relatedGenres;
+
+    // Simplified condition generation - reduce redundant checks
+    const mainGenreConditions = [
+      `"${slug}" in genre[].main`,
+      `"${mainGenreName}" in genre[].main`,
+      `genre[].main == "${mainGenreName}"`
+    ];
+
+    const relatedConditions = relatedGenres.flatMap((genre: string) => [
+      `"${genre}" in genre[].main`,
+      `genre[].main == "${genre}"`
+    ]);
+
+    filterCondition = [...mainGenreConditions, ...relatedConditions].join(' || ');
+  } else {
+    const genreName = slugToLabelName(slug);
+
+    // Simplified fallback condition
+    filterCondition = [
+      `"${slug}" in genre[].main`,
+      `"${genreName}" in genre[].main`,
+      `genre[].main == "${genreName}"`
+    ].join(' || ');
+  }
+
+  // Cache the result
+  filterConditionCache.set(slug, {
+    condition: filterCondition,
+    timestamp: Date.now()
+  });
+
+  return filterCondition;
+}
+
+async function getFeaturedProducts(slug: string): Promise<any[]> {
+  const filterCondition = await getFilterCondition(slug);
+
+  const BASE_PRODUCT_FILTER =
+    '_type == "product" && !(_id in path("drafts.**")) && defined(mainImage.asset)';
+  const featuredFilter = `${BASE_PRODUCT_FILTER} && (${filterCondition}) && week[0] != "0001" && defined(swellProductId) && stock > 0 && inStock == true && featured == true`;
+
+  // FIXED: Add missing fields for play button and complete product data
+  const OPTIMIZED_QUERY_FIELDS = `
+    _id,
+    title,
+    price,
+    stock,
+    swellProductId,
+    swellSlug,
+    sku,
+    artist,
+    label,
+    week,
+    tracklist[]{
+      title,
+      artist,
+      audioUrl
+    },
+    discogsReleaseId,
+    shortDescription,
+    description,
+    mainImage{
+      asset->{
+        _id,
+        url,
+        metadata{
+          lqip,
+          dimensions{
+            width,
+            height
+          }
+        }
+      },
+      alt
+    },
+    featured,
+    inStock,
+    orderRank
+  `;
+
+  const featuredQuery = `*[${featuredFilter}] | order(coalesce(orderRank, "zzz") asc) [0...6] {
+    ${OPTIMIZED_QUERY_FIELDS}
+  }`;
+
+  try {
+    const products = await sanityClient.fetch(featuredQuery);
+    if (!products || !Array.isArray(products)) return [];
+
+    // FIXED: Complete product transformation with all required fields
+    return products.map((product: any) => ({
+      id: product._id,
+      _id: product._id, // Add both id formats
+      slug: product.swellSlug || product.sku || product._id,
+      sku: product.sku || product._id,
+      name: product.title || 'Untitled',
+      title: product.title || 'Untitled',
+      price: product.price, // FIXED: Don't default to 0, keep original value
+      currency: 'USD',
+      stock: product.stock,
+      stock_level: product.stock || 0,
+      stock_purchasable: Boolean(product.inStock && (product.stock || 0) > 0),
+      stock_tracking: false,
+      inStock: product.inStock,
+      featured: product.featured || false,
+      artist: product.artist,
+      label: product.label,
+      week: product.week,
+      orderRank: product.orderRank,
+
+      // FIXED: Add tracklist and related fields for play button
+      tracklist: product.tracklist || [],
+      discogsReleaseId: product.discogsReleaseId,
+      shortDescription: product.shortDescription,
+      description: product.description,
+
+      // Image fields
+      mainImage: product.mainImage,
+      imageUrl: product.mainImage?.asset?.url,
+      images: product.mainImage ? [{ file: { url: product.mainImage.asset?.url } }] : [],
+
+      // Product links
+      productSlug: product.swellSlug || product.sku || product._id,
+      swellProductId: product.swellProductId,
+
+      // FIXED: Add sanityContent structure that ProductCard expects
+      sanityContent: {
+        _id: product._id,
+        title: product.title,
+        artist: product.artist,
+        label: product.label,
+        stock: product.stock,
+        tracklist: product.tracklist || [],
+        discogsReleaseId: product.discogsReleaseId,
+        shortDescription: product.shortDescription,
+        description: product.description,
+        mainImage: product.mainImage
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    return [];
+  }
+}
+
+const genreConfig = {
+  type: 'genre' as const,
+  getProductsFunction: async (slug: string, page: number, sort: string) => {
+    const limit = page === 1 ? 48 : 44;
+
+    try {
+      // Run queries in parallel for better performance
+      const [regularResult, featuredProducts] = await Promise.all([
+        getProductsByArchive('genre', slug, page, limit),
+        page === 1 ? getFeaturedProducts(slug) : Promise.resolve([])
+      ]);
+
+      const totalProductsCount = regularResult.total || 0;
+      const adjustedTotal =
+        totalProductsCount > 0 ? totalProductsCount + featuredProducts.length : totalProductsCount;
+      const adjustedPages = adjustedTotal <= 42 ? 1 : 1 + Math.ceil((adjustedTotal - 42) / 44);
+
+      if (page === 1) {
+        const featuredIds = featuredProducts.map((p) => p.id);
+        const nonFeaturedProducts =
+          regularResult.products
+            ?.filter((product: any) => !featuredIds.includes(product.id))
+            .slice(0, 36) || [];
+
+        return {
+          ...regularResult,
+          products: nonFeaturedProducts,
+          featuredProducts: featuredProducts,
+          showFeatured: featuredProducts.length > 0,
+          total: adjustedTotal,
+          pages: adjustedPages
+        };
+      }
+
+      return {
+        ...regularResult,
+        featuredProducts: [],
+        showFeatured: false,
+        total: adjustedTotal,
+        pages: adjustedPages
+      };
+    } catch (error) {
+      console.error('Error in getProductsFunction:', error);
+      return {
+        products: [],
+        featuredProducts: [],
+        showFeatured: false,
+        total: 0,
+        pages: 0,
+        currentPage: page,
+        actualName: slugToLabelName(slug)
+      };
+    }
+  },
+  pluralName: 'Genres',
+  singularName: 'Genre',
+  collectionTitle: 'Genre Collection',
+  breadcrumbPath: '/shop/genres',
+  basePath: '/shop/genre',
+  schemaType: '@type' as const,
+  bgColor: 'bg-success'
+};
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  return generateArchiveMetadata(resolvedParams, genreConfig);
+}
+
+function slugToLabelName(slug: string): string {
+  return slug
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+export default async function GenrePage({ params, searchParams }: PageProps) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || '1');
+
+  if (page > 1) {
+    const slug = resolvedParams.slug;
+
+    try {
+      // Optimize pagination check with parallel queries
+      const [filterCondition] = await Promise.all([getFilterCondition(slug)]);
+
+      const BASE_PRODUCT_FILTER =
+        '_type == "product" && !(_id in path("drafts.**")) && defined(mainImage.asset)';
+      const fullFilter = `${BASE_PRODUCT_FILTER} && (${filterCondition}) && week[0] != "0001" && defined(swellProductId) && stock > 0 && inStock == true`;
+
+      // Use optimized count query
+      const countQuery = `count(*[${fullFilter}])`;
+
+      const [total, featuredProducts] = await Promise.all([
+        sanityClient.fetch(countQuery),
+        getFeaturedProducts(slug)
+      ]);
+
+      const adjustedTotal = total + featuredProducts.length;
+      const maxPages = adjustedTotal <= 42 ? 1 : 1 + Math.ceil((adjustedTotal - 42) / 44);
+
+      if (page > maxPages) {
+        redirect(`/shop/genre/${resolvedParams.slug}?page=${maxPages}`);
+      }
+    } catch (error) {
+      console.error('Error in pagination check:', error);
+      // Don't redirect on error, let the page handle it gracefully
+    }
+  }
+
+  return (
+    <ArchivePage params={resolvedParams} searchParams={resolvedSearchParams} config={genreConfig} />
+  );
+}

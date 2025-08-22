@@ -1,0 +1,92 @@
+// app/shop/genre/[slug]/page.tsx - Static version following product page pattern
+import { GridContainer } from 'components/grid/Container';
+import { GridItem } from 'components/grid/Item';
+import Product from 'components/products/ProductCard';
+import { getProductsByArchive } from 'lib/data/products/index';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+export const runtime = 'nodejs';
+export const revalidate = 3600;
+
+// Generate static params for menu genres
+export async function generateStaticParams() {
+  const menuGenres = [
+    "house", "jazz", "ambient", "disco", "electronic", "brazil",
+    "africa", "techno", "asia", "world", "downtempo", "gospel",
+    "library", "hip-hop", "rock", "experimental"
+  ];
+  
+  console.log(`🎵 Generating static params for ${menuGenres.length} menu genres`);
+  
+  return menuGenres.map(genre => ({ slug: genre }));
+}
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  return {
+    title: `${slug.charAt(0).toUpperCase() + slug.slice(1)} Music - The Mixtape Club`,
+    description: `Discover ${slug} music and vinyl records at The Mixtape Club.`
+  };
+}
+
+export default async function GenrePage({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+  const { page = '1' } = await searchParams;
+  const currentPage = parseInt(page, 10) || 1;
+
+  // Pre-fetch products for this genre (similar to how product pages work)
+  let products = [];
+  let total = 0;
+  
+  try {
+    const result = await getProductsByArchive('genre', slug, currentPage, 40);
+    products = result.products || [];
+    total = result.total || 0;
+  } catch (error) {
+    console.error(`Error fetching products for genre ${slug}:`, error);
+  }
+
+  if (products.length === 0 && currentPage === 1) {
+    notFound();
+  }
+
+  return (
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-12">
+          <h1 className="h2 mb-4">
+            {slug.charAt(0).toUpperCase() + slug.slice(1)} Music
+          </h1>
+          <p className="text-muted mb-4">
+            {total} {total === 1 ? 'product' : 'products'} found
+          </p>
+        </div>
+      </div>
+
+      <GridContainer>
+        {products.map((product: any, index: number) => (
+          <GridItem
+            key={`genre-${slug}-product-${product.id}-${index}`}
+            type="product"
+            id={product.id}
+            inStock={product.stock_level > 0}
+            category={product.category || 'Music'}
+            className="col-6 col-sm-4 col-lg-3"
+          >
+            <Product
+              product={product}
+              priority={index < 8}
+              index={index}
+            />
+          </GridItem>
+        ))}
+      </GridContainer>
+    </div>
+  );
+}

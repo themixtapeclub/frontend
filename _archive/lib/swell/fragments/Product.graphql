@@ -1,0 +1,51 @@
+fragment Product on SwellProduct {
+  id
+  currency
+  slug
+  stockTracking
+  stockPurchasable
+  stockLevel
+  name
+  description
+  options {
+    name
+    id
+    description
+    variant
+    values {
+      id
+      name
+      price
+    }
+  }
+  price
+  variants {
+    results {
+      ...ProductVariant
+    }
+  }
+  images {
+    file {
+      url
+      width
+      height
+    }
+    caption
+  }
+  metaTitle
+  metaDescription
+  tags
+}
+
+fragment ProductVariant on SwellProductVariant {
+  id
+  name
+  sku
+  prices {
+    price
+    discountPercent
+  }
+  optionValueIds
+  stockLevel
+  currency
+}

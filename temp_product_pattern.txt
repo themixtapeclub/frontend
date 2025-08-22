@@ -1,0 +1,30 @@
+// app/product/[handle]/page.tsx
+import { ProductDescription } from '@/components/product/Content';
+import { OptimizedImages } from 'components/common/OptimizedImages';
+import {
+  ImagesErrorBoundary,
+  ProductDetailsErrorBoundary,
+  ProductErrorBoundary,
+  RelatedProductsErrorBoundary
+} from 'components/error-boundaries/ApiErrorBoundary';
+import ClientSideRelatedProducts from 'components/product/ClientSideRelatedProducts';
+import { ScrollToTop } from 'components/ui/ScrollToTop';
+import { SanityContent } from 'lib/data/products/types';
+import { getRelatedProducts } from 'lib/queries/sanity/products/relatedProducts';
+import { getProductDataBySwell } from 'lib/services/optimizedProduct';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+// Generate static params for homepage products
+export async function generateStaticParams() {
+  try {
+    console.log('🏠 Generating static params for homepage products...');
+
+    const { getBatchProductsCached } = await import('lib/data/products/index');
+    const productsData = await getBatchProductsCached();
+
+    const allHomepageProducts = [...productsData.featured, ...productsData.new];
+
+    const uniqueProducts = allHomepageProducts.filter(
+      (product, index, arr) => arr.findIndex((p) => p.slug === product.slug) === index
+    );

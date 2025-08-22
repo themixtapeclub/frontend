@@ -1,0 +1,21 @@
+query getProduct($slug: String!) {
+  productBySlug(slug: $slug) {
+    ...Product
+  }
+}
+
+query getProducts($sort: String, $query: String) {
+  products(sort: $sort, search: $query) {
+    results {
+      ...Product
+    }
+  }
+}
+
+query getProductsByCategory($sort: String, $query: String, $category: String) {
+  products(sort: $sort, search: $query, categories: [$category]) {
+    results {
+      ...Product
+    }
+  }
+}

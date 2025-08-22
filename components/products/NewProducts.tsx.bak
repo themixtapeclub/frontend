@@ -1,0 +1,68 @@
+// components/products/NewProducts.tsx
+
+import { GridContainer } from 'components/grid/Container';
+import { GridItem } from 'components/grid/Item';
+import ProductCard from 'components/products/ProductCard';
+import { MergedProduct, getNewProducts } from 'lib/data/products';
+
+type ExtendedMergedProduct = MergedProduct & {
+  _id?: string;
+  stock?: number;
+  genre?: string;
+  sku?: string;
+};
+
+interface NewProductsProps {
+  preloadedData?: ExtendedMergedProduct[];
+  excludedIds?: string[];
+}
+
+declare global {
+  var featuredProductIds: string[] | undefined;
+  var featuredProductsComplete: boolean | undefined;
+}
+
+export default async function NewProducts({ preloadedData, excludedIds }: NewProductsProps = {}) {
+  const startTime = Date.now();
+
+  try {
+    let products: ExtendedMergedProduct[];
+
+    if (preloadedData && preloadedData.length > 0) {
+      products = preloadedData;
+    } else {
+      let waitTime = 0;
+      while (!global.featuredProductsComplete && waitTime < 10000) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        waitTime += 100;
+      }
+
+      const finalExcludedIds = excludedIds || global.featuredProductIds || [];
+      products = (await getNewProducts(12, finalExcludedIds)) as ExtendedMergedProduct[];
+    }
+
+    if (!products?.length) {
+      return null;
+    }
+
+    return (
+      <GridContainer>
+        {products.map((product: ExtendedMergedProduct, index: number) => (
+          <GridItem
+            key={`new-${product.sku || product.id}-${index}`}
+            type="product"
+            id={product.id}
+            inStock={(product.stock || 0) > 0}
+            stock={product.stock || 0}
+            category={product.genre}
+            featured={false}
+          >
+            <ProductCard key={product.id || product._id} product={product as any} index={index} />
+          </GridItem>
+        ))}
+      </GridContainer>
+    );
+  } catch (error) {
+    return null;
+  }
+}
