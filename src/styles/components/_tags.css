@@ -1,0 +1,14 @@
+/* src/styles/components/_tags.css */
+
+.tag-link {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  font-size: var(--text-small);
+  transition: color 0.2s;
+}
+
+.tag-link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,142 @@
+/* src/styles/components/_button.css */
+.btn,
+.btn * {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-family: var(--font-system85-mono-pro), monospace !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  white-space: nowrap;
+}
+
+.btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-mini {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.btn-small {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.btn-base {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+
+.btn-large {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 13px;
+}
+
+.btn-xlarge {
+  height: 56px;
+  padding: 0 32px;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #222;
+}
+
+.btn-primary:active:not(:disabled) {
+  background: #333;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.btn-secondary:active:not(:disabled) {
+  background: #eee;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.btn-transparent {
+  background: transparent;
+  color: inherit;
+  border-color: transparent;
+}
+
+.btn-transparent:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-loading {
+  pointer-events: none;
+}
+
+.btn-spinner {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-mini .btn-spinner svg {
+  width: 12px;
+  height: 12px;
+}
+
+.btn-spinner svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-large .btn-spinner svg,
+.btn-xlarge .btn-spinner svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-testid="checkout-container"] .btn,
+[data-testid="checkout-container"] .btn *,
+[data-testid="checkout-container"] .btn span {
+  font-family: var(--font-system85-mono-pro), monospace !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+}

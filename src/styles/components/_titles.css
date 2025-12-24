@@ -1,0 +1,66 @@
+/* src/styles/components/_titles.css */
+
+.page-title {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  font-weight: 700 !important;
+  font-size: var(--text-heading);
+  line-height: var(--leading-tight);
+  display: inline;
+}
+
+.section-title {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  font-weight: 700 !important;
+  font-size: var(--text-heading);
+  line-height: var(--leading-tight);
+}
+
+.card-title {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  font-weight: 700 !important;
+  font-size: var(--text-regular);
+  line-height: var(--leading-tight);
+  display: inline;
+}
+
+.artist-title {
+  font-size: var(--text-regular);
+  line-height: var(--leading-tight);
+}
+
+.artist-title--large {
+  font-size: var(--text-heading);
+}
+
+.artist-title .artist {
+  display: inline;
+  margin-right: var(--space-sm);
+}
+
+
+.artist-title .title {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  font-weight: 700 !important;
+  display: inline;
+}
+
+.label-text {
+  font-size: var(--text-small);
+  line-height: var(--leading-tight);
+}
+
+.artist-title--large .artist {
+  margin-right: var(--space-md);
+}

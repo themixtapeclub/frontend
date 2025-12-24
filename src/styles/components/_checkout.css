@@ -1,0 +1,27 @@
+.floating-input {
+  position: relative;
+}
+
+.floating-input input {
+  padding-top: 1.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.floating-input label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--color-disabled);
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  transform-origin: left top;
+}
+
+.floating-input input:focus + label,
+.floating-input input:not(:placeholder-shown) + label {
+  top: 0.5rem;
+  transform: translateY(0) scale(0.75);
+  color: var(--color-text);
+}

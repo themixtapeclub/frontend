@@ -1,0 +1,9 @@
+/* src/modules/common/components/inline-audio-controller/styles.css */
+.track-nav-btn {
+  background: none;
+  border: none;
+  color: white;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+}

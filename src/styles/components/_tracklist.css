@@ -1,0 +1,17 @@
+/* src/styles/components/_tracklist.css */
+
+.tracklist-row {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+}
+
+.tracklist-artist {
+  font-size: var(--text-regular);
+}
+
+.tracklist-title {
+  font-size: var(--text-regular);
+  font-weight: 700 !important;
+}

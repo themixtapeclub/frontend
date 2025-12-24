@@ -1,0 +1,8 @@
+ /* src/styles/layouts/_footer.css */
+
+.footer-text {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+}

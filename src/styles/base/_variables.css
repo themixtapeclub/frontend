@@ -1,0 +1,38 @@
+/* src/styles/base/_variables.css */
+:root {
+  --color-black: #121212;
+  --color-white: #f5f5f5;
+  --color-black-pure: #000;
+  --color-white-pure: #fff;
+  --color-text: var(--color-black);
+  --color-text-inverse: var(--color-white);
+  --color-bg: var(--color-white-pure);
+  --color-bg-inverse: var(--color-black-pure);
+  --color-title: #f7d51d;
+  --color-disabled: #6c757d;
+  --border-base: var(--color-black-pure);
+  --font-sans: var(--font-system85-pro), system-ui, sans-serif;
+  --font-mono: var(--font-system85-mono-pro), monospace;
+  --text-regular: 1rem;
+  --text-heading: 1.5rem;
+  --text-small: 0.8rem;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --space-xs: 5px;
+  --space-sm: 10px;
+  --space-md: 20px;
+  --space-lg: 30px;
+  --space-xl: 40px;
+  --header-padding-x: 10px;
+  --header-min-height: 1.45rem;
+  --header-height: 3.3rem;
+  --card-padding: 10px;
+  --card-padding-bottom: 40px;
+  --blur-sm: 8px;
+  --blur-md: 12px;
+  --blur-lg: 20px;
+  --opacity-idle: 0.4;
+  --opacity-disabled: 0.5;
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+}

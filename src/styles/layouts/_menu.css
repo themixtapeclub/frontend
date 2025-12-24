@@ -1,0 +1,13 @@
+/* src/styles/layouts/_menu.css */
+
+.menu-link {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+}
+
+.menu-link.active,
+.menu-link.bold {
+  font-weight: 700 !important;
+}

@@ -1,0 +1,108 @@
+/* src/styles/base/_typography.css */
+
+.mono {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: "pnum", "ss02", "ss06" !important;
+  letter-spacing: -0.0125rem !important;
+  -webkit-font-smoothing: subpixel-antialiased !important;
+}
+
+.outline {
+  /* padding: var(--space-xs); */
+  text-shadow:
+    0.75px 0px 0px #050505,
+    1.31638px 0.719138px 0px #050505,
+    0.81045px 1.262205px 0px #050505,
+    0.106106px 1.496242px 0px #050505,
+    -0.624221px 1.363942px 0px #050505,
+    -1.201717px 0.897705px 0px #050505,
+    -1.48599px 0.21168px 0px #050505,
+    -1.404683px -0.526175px 0px #050505,
+    -0.980468px -1.1352px 0px #050505,
+    -0.316194px -1.466295px 0px #050505,
+    0.425493px -1.438387px 0px #050505,
+    1.063005px -1.05831px 0px #050505,
+    1.140255px -0.419148px 0px #050505;
+  font-weight: 500;
+  color: var(--color-text-inverse) !important;
+  outline-style: none !important;
+  text-decoration: none;
+}
+
+.outline:hover {
+  text-decoration: none;
+}
+
+.outline-icon {
+  fill: var(--color-text-inverse) !important;
+  stroke: #050505;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+}
+
+.yellow {
+  color: var(--color-title) !important;
+}
+
+.outline.yellow {
+  color: var(--color-title) !important;
+}
+
+.bold, strong {
+  font-weight: 700 !important;
+}
+.text-small {
+  font-size: var(--text-small);
+}
+.text-large {
+  font-size: var(--text-heading);
+}
+
+.outline-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+}
+
+.outline-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mix-blend-mode: difference;
+  position: relative;
+  z-index: 999;
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 0;
+}
+
+.outline, .outline-button, .outline-menu-button {
+  line-height: 1;
+}
+
+.txt-xlarge-plus,
+.txt-large-plus,
+.txt-large,
+.txt-medium-plus,
+.txt-medium,
+.txt-small-plus,
+.txt-small,
+.txt-xsmall-plus,
+.txt-xsmall,
+.txt-compact-xlarge-plus,
+.txt-compact-xlarge,
+.txt-compact-large-plus,
+.txt-compact-large,
+.txt-compact-medium-plus,
+.txt-compact-medium,
+.txt-compact-small-plus,
+.txt-compact-small,
+.txt-compact-xsmall-plus,
+.txt-compact-xsmall {
+  font-family: var(--font-sans) !important;
+  font-size: inherit;
+}
